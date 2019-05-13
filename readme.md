@@ -11,11 +11,11 @@ with every afterSave and afterDelete.
 
 This plugin provides
 
- - a behavior to automatically update your indexes
- - a shell task to do full index fills
- - a generic search component that you can attach to your AppController and will intercept
-   search actions on enabled models. Will return results in JSON format for easy
-   AJAX integration.
+- a behavior to automatically update your indexes
+- a shell task to do full index fills
+- a generic search component that you can attach to your AppController and will intercept
+  search actions on enabled models. Will return results in JSON format for easy
+  AJAX integration.
 
 ## Installation
 
@@ -112,7 +112,6 @@ public $actsAs = array(
 );
 ?>
 ```
-
 
 `Models/Ticket.php` (full example)
 
@@ -226,8 +225,8 @@ public $components = array(
 This component will only actually fire when the Controller->modelClass
 has the searchable behavior attached.
 
-I chose for this method  (vs a dedicated SearchesController) so ACLing is easier.
-e.g. You may already have an ACL for /tickets/*, so /tickets/search will automatically
+I chose for this method (vs a dedicated SearchesController) so ACLing is easier.
+e.g. You may already have an ACL for /tickets/\*, so /tickets/search will automatically
 be restricted the same way.
 
 #### Generic search
@@ -237,18 +236,20 @@ and instruct to search on everything like so:
 
 ```php
 <?php
-class SearchersController extends AppController {
-	public $components = array(
-		'Elasticsearch.Searcher' => array(
-			'model' => '_all',
-			'leading_model' => 'Ticket',
-		),
-		// ... etc
-	);
+class SearchersController extends AppController
+{
+  public $components = array(
+    'Elasticsearch.Searcher' => array(
+      'model' => '_all',
+      'leading_model' => 'Ticket'
+    )
+    // ... etc
+  );
 
-	public function searcher () {
-		$this->Searcher->searchAction($this->RequestHandler->isAjax());
-	}
+  public function searcher()
+  {
+    $this->Searcher->searchAction($this->RequestHandler->isAjax());
+  }
 }
 ?>
 ```
@@ -256,7 +257,6 @@ class SearchersController extends AppController {
 One known limitation is that the Elasticsearch plugin will only look at the
 first configured Model for configuration parameters like `searcher_param`
 and `searcher_action`.
-
 
 ## Try it
 
@@ -289,32 +289,42 @@ Assuming you have included that library, and have an input field with attributes
 
 ```javascript
 // Main-search
-$(document).ready(function () {
-	$("#main-search").autocomplete({
-		source: function(request, response) {
-			$.getJSON($("#main-search").attr('target').replace('{query}', request.term), null, response);
-		},
-		delay: 100,
-		select: function(event, ui) {
-			var id = 0;
-			if ((id = ui.item.id)) {
-				location.href = ui.item.url;
-				alert('Selected: #' +  id + ': ' + ui.item.url);
-			}
-			return false;
-		}
-	}).data( "autocomplete" )._renderItem = function( ul, item ) {
-		return $("<li></li>")
-			.data("item.autocomplete", item)
-			.append("<a href='" + item.url + "'>" + item.html + "<br>" + item.descr + "</a>")
-			.appendTo(ul);
-	};
+$(document).ready(function() {
+  $("#main-search")
+    .autocomplete({
+      source: function(request, response) {
+        $.getJSON(
+          $("#main-search")
+            .attr("target")
+            .replace("{query}", request.term),
+          null,
+          response
+        );
+      },
+      delay: 100,
+      select: function(event, ui) {
+        var id = 0;
+        if ((id = ui.item.id)) {
+          location.href = ui.item.url;
+          alert("Selected: #" + id + ": " + ui.item.url);
+        }
+        return false;
+      }
+    })
+    .data("autocomplete")._renderItem = function(ul, item) {
+    return $("<li></li>")
+      .data("item.autocomplete", item)
+      .append(
+        "<a href='" + item.url + "'>" + item.html + "<br>" + item.descr + "</a>"
+      )
+      .appendTo(ul);
+  };
 });
 ```
 
 ## Note
 
- - There also is an unmaintained legacy [cakephp 1.3 branch](https://github.com/kvz/cakephp-elasticsearch-plugin/tree/cake-1.3)
+- There also is an unmaintained legacy [cakephp 1.3 branch](https://github.com/kvz/cakephp-elasticsearch-plugin/tree/cake-1.3)
 
 ## Useful commands
 
