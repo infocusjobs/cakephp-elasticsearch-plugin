@@ -564,7 +564,7 @@ class SearchableBehavior extends ModelBehavior
         curl_setopt($conn, CURLOPT_CUSTOMREQUEST, $method);
 
         if (!empty($payload)) {
-            if (is_array($payload)) {
+            if (!is_string($payload)) {
                 $content = $this->_serializeDocument($Model, $payload);
             } else {
                 $content = $payload;
@@ -609,52 +609,13 @@ class SearchableBehavior extends ModelBehavior
         return $response;
     }
 
-    public function query($Model, $query, $queryParams)
-    {
-        $queryParams = $this->_queryParams($Model, $queryParams, array(
-            'enforce',
-            'highlight',
-            'limit',
-            'fields'
-        ));
-
-        $payload = array();
-
-        if ($queryParams['highlight']) {
-            $payload['highlight'] = $queryParams['highlight'];
-        }
-        if ($queryParams['limit']) {
-            $payload['size'] = $queryParams['limit'];
-        }
-        if (@$queryParams['sort']) {
-            $payload['sort'] = $queryParams['sort'];
-        }
-
-        $payload['query']['bool']['must'][0]['query_string'] = array(
-            'query' => $query,
-            'use_dis_max' => true
-        );
-        if (is_array($queryParams['fields'])) {
-            $payload['query']['bool']['must'][0]['query_string']['fields'] =
-                $queryParams['fields'];
-        }
-
-        if ($queryParams['enforce']) {
-            $i = count($payload['query']['bool']['must']);
-            $payload['query']['bool']['must'][$i]['term'] =
-                $queryParams['enforce'];
-        }
-
-        return $payload;
-    }
-
     /**
      * Search. Arguments can be different wether the call is made like
      *  - $Model->elastic_search, or
      *  - $this->search
      * that's why I eat&check away arguments with array_shift
      *
-     * @return string
+     * @return array of results or void
      */
     public function search()
     {
@@ -685,13 +646,8 @@ class SearchableBehavior extends ModelBehavior
             return;
         }
 
-        // queryParams
-        $queryParams = array_key_exists(0, $args)
-            ? array_shift($args)
-            : array();
-
         // Build Query
-        $payload = $this->query($LeadingModel, $query, $queryParams);
+        $payload = $query; // Just let us specify the payload directly. -DMWL
 
         // Custom Elasticsearch CuRL Job
         $r = $this->execute($LeadingModel, 'GET', '_search', $payload);
