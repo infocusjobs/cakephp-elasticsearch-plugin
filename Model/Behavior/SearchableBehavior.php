@@ -541,9 +541,8 @@ class SearchableBehavior extends ModelBehavior
         $path = $prefix . $path;
 
         $uri = sprintf(
-            'http://%s:%s/%s',
-            $this->opt($Model, 'host'),
-            $this->opt($Model, 'port'),
+            '%s/%s',
+            $this->opt($Model, 'url'),
             $path
         );
 
@@ -559,7 +558,6 @@ class SearchableBehavior extends ModelBehavior
             CURLOPT_TIMEOUT,
             $this->opt($Model, 'curl_total_timeout')
         );
-        curl_setopt($conn, CURLOPT_PORT, $this->opt($Model, 'port'));
         curl_setopt($conn, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($conn, CURLOPT_CUSTOMREQUEST, $method);
 
@@ -867,8 +865,7 @@ class SearchableBehavior extends ModelBehavior
 
         $DB = ConnectionManager::enumConnectionObjects();
 
-        $this->settings[$Model->alias]['host'] = $DB['elastic']['host'];
-        $this->settings[$Model->alias]['port'] = $DB['elastic']['port'];
+        $this->settings[$Model->alias]['url'] = $DB['elastic']['url'];
 
         //$this->settings[$Model->alias]['index_name'] = $this->opt($Model, 'index_name');
         $this->settings[$Model->alias]['type'] = Inflector::underscore(
