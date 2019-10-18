@@ -600,7 +600,7 @@ class SearchableBehavior extends ModelBehavior
             return sprintf(
                 'Error from elasticsearch server while contacting %s (%s)',
                 $uri,
-                @$response['error']
+                var_export($response['error'], true)
             );
         }
 
